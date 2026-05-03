@@ -89,5 +89,9 @@ public class PosAVL {
         if (cmp == 0) return node;
         else if (cmp < 0) return search(node.left, pos);
         else return search(node.right, pos);
-    }       
+    }
+
+    public PosNode searchByPosition(String pos) {
+        return search(root, pos);
+    }
 }

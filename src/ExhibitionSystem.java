@@ -2,6 +2,7 @@ import java.util.Scanner;
 import structures.tree.NameAVL;
 import structures.tree.NameNode;
 import structures.tree.PosAVL;
+import structures.tree.PosNode;
 
 public class ExhibitionSystem {
 
@@ -20,6 +21,7 @@ public class ExhibitionSystem {
             System.out.println("2. Reserve");
             System.out.println("3. Show AVL");
             System.out.println("4. Search by Name");
+            System.out.println("5. Search by Position");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
@@ -47,24 +49,49 @@ public class ExhibitionSystem {
                 else {
                     System.out.println("Positions for " + name + ": " + result.positions);
                 }
+            } else if(choice == 5) {
+                System.out.print("Enter position to search: ");
+                String pos = sc.nextLine();
+
+                PosNode result = posTree.searchByPosition(pos);
+
+                if(result == null) {
+                    System.out.println("Position not found.");
+                } else {
+                    System.out.println("Position " + pos + " reserved by: " + result.name);
+                }
             } else break;
         }
     }
 
     public static void reserve(String name, String[] positions) {
 
+        // ✅ เช็ค format ก่อน
+        for(String pos : positions) {
+            if(!isValidPosition(pos)) {
+                System.out.println("Invalid position: " + pos);
+                return; // ❗ หยุดทันที
+            }
+        }
+
+        // ✅ เช็คว่าซ้ำไหม
         for(String pos : positions) {
             if(posTree.exists(pos)) {
                 System.out.println("Position " + pos + " is already reserved.");
                 return;
             }
-        }   
+        }
 
+        // ✅ insert จริง
         for(String pos : positions) {
             nameTree.insert(name, pos);
             posTree.insert(pos, name);
         }
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
+    }
+
+    private static boolean isValidPosition(String pos) {
+        return pos.matches("^[A-F](1[0-2]|[1-9])$");
     }
 }

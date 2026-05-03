@@ -1,8 +1,4 @@
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import structures.tree.NameAVL;
 import structures.tree.NameNode;
 import structures.tree.PosAVL;
@@ -75,7 +71,7 @@ public class ExhibitionSystem {
         for(String pos : positions) {
             if(!isValidPosition(pos)) {
                 System.out.println("Invalid position: " + pos);
-                return; // ❗ หยุดทันที
+                return Map; //หยุดทันที
             }
         }
 

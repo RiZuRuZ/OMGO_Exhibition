@@ -53,18 +53,32 @@ public class ExhibitionSystem {
 
     public static void reserve(String name, String[] positions) {
 
+        // ✅ เช็ค format ก่อน
+        for(String pos : positions) {
+            if(!isValidPosition(pos)) {
+                System.out.println("Invalid position: " + pos);
+                return; // ❗ หยุดทันที
+            }
+        }
+
+        // ✅ เช็คว่าซ้ำไหม
         for(String pos : positions) {
             if(posTree.exists(pos)) {
                 System.out.println("Position " + pos + " is already reserved.");
                 return;
             }
-        }   
+        }
 
+        // ✅ insert จริง
         for(String pos : positions) {
             nameTree.insert(name, pos);
             posTree.insert(pos, name);
         }
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
+    }
+
+    private static boolean isValidPosition(String pos) {
+        return pos.matches("^[A-F](1[0-2]|[1-9])$");
     }
 }

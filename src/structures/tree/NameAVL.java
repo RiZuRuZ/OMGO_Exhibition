@@ -107,5 +107,5 @@ public class NameAVL {
         if (cmp == 0) return node;
         else if (cmp < 0) return searchRec(node.left, name);
         else return searchRec(node.right, name);
-    }  
+    }
 }

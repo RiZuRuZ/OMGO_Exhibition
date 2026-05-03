@@ -23,45 +23,57 @@ public class ExhibitionSystem {
             System.out.println("3. Show AVL");
             System.out.println("4. Search by Name");
             System.out.println("5. Search by Position");
+            System.out.println("6. Path Finder");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
             sc.nextLine(); 
+            switch(choice) {
+                case 1:
+                    showMap(Map);
+                    break;
+                case 2:
+                    System.out.print("Enter name: ");
+                    String name = sc.nextLine();
 
-            if(choice == 1) {
-                showMap(Map);
-            }else if(choice == 2) {
-                System.out.print("Enter name: ");
-                String name = sc.nextLine();
+                    System.out.print("Enter positions (e.g. A1 A2 A3): ");
+                    String input = sc.nextLine();
+                    String[] positions = input.split(" ");
 
-                System.out.print("Enter positions (e.g. A1 A2 A3): ");
-                String input = sc.nextLine();
-                String[] positions = input.split(" ");
+                    Map = reserve(name, positions, Map);
+                    break;
+                case 3:
+                    nameTree.printTree();
+                    break;
+                case 4:
+                    System.out.print("Enter name to search: ");
+                    String name = sc.nextLine();
+                    NameNode result = nameTree.search(name);
 
-                reserve(name, positions, Map);
-            } else if(choice == 3) {
-                nameTree.printTree();
-            } else if(choice == 4) {
-                System.out.print("Enter name to search: ");
-                String name = sc.nextLine();
-                NameNode result = nameTree.search(name);
+                    if(result == null) System.out.println("Name not found.");
+                    else {
+                        System.out.println("Positions for " + name + ": " + result.positions);
+                    }
+                    break;
+                case 5:
+                    System.out.print("Enter position to search: ");
+                    String pos = sc.nextLine();
 
-                if(result == null) System.out.println("Name not found.");
-                else {
-                    System.out.println("Positions for " + name + ": " + result.positions);
-                }
-            } else if(choice == 5) {
-                System.out.print("Enter position to search: ");
-                String pos = sc.nextLine();
+                    PosNode result = posTree.searchByPosition(pos);
 
-                PosNode result = posTree.searchByPosition(pos);
-
-                if(result == null) {
-                    System.out.println("Position not found.");
-                } else {
-                    System.out.println("Position " + pos + " reserved by: " + result.name);
-                }
-            } else break;
+                    if(result == null) {
+                        System.out.println("Position not found.");
+                    } else {
+                        System.out.println("Position " + pos + " reserved by: " + result.name);
+                    }
+                    break;
+                case 0:
+                    System.out.println("Exiting...");
+                    sc.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
         }
     }
 
@@ -141,5 +153,9 @@ public class ExhibitionSystem {
 
     private static boolean isValidPosition(String pos) {
         return pos.matches("^[A-F](1[0-2]|[1-9])$");
+    }
+
+    public static void ShortestPath(int[][] Map, String start, String end) {
+        // Implement Dijkstra's algorithm to find the shortest path from start to end
     }
 }

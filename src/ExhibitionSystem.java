@@ -170,8 +170,204 @@ public class ExhibitionSystem {
             System.out.println();
         }
     }
+    //อื่นๆใส่ก่อนA* นะจ๊ะจะได้ไม่งง
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // A* Algorithm
     public static void ShortestPath(int[][] Map, String start, String end) {
-        // Implement Dijkstra's algorithm to find the shortest path from start to end
+
+        if(!isValidPosition(start) || !isValidPosition(end)) {
+            System.out.println("Invalid start or end position.");
+            return;
+        }
+
+        int[] startCoor = parseCoor(start);
+        int[] endCoor = parseCoor(end);
+
+        System.out.println("Calculating shortest path from " + start + " (" + startCoor[0] + "," + startCoor[1] + ") to " + end + " (" + endCoor[0] + "," + endCoor[1] + ")...");
+
+        int rows = Map.length;
+        int cols = Map[0].length;
+
+        if(!isInBounds(startCoor, rows, cols) || !isInBounds(endCoor, rows, cols)) {
+            System.out.println("Start or end position is out of bounds.");
+            return;
+        }
+
+        int[][] gScore = new int[rows][cols];
+        int[][] fScore = new int[rows][cols];
+        int[][] parentRow = new int[rows][cols];
+        int[][] parentCol = new int[rows][cols];
+        boolean[][] closedSet = new boolean[rows][cols];
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                gScore[i][j] = Integer.MAX_VALUE;
+                fScore[i][j] = Integer.MAX_VALUE;
+                parentRow[i][j] = -1;
+                parentCol[i][j] = -1;
+            }
+        }
+
+        int startRow = startCoor[0];
+        int startCol = startCoor[1];
+        int endRow = endCoor[0];
+        int endCol = endCoor[1];
+
+        java.util.PriorityQueue<Node> openSet = new java.util.PriorityQueue<>();
+        gScore[startRow][startCol] = 0;
+        fScore[startRow][startCol] = heuristic(startCoor, endCoor);
+        openSet.add(new Node(startRow, startCol, fScore[startRow][startCol]));
+
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        while(!openSet.isEmpty()) {
+            Node current = openSet.poll();
+
+            if(closedSet[current.row][current.col]) {
+                continue;
+            }
+
+            if(current.row == endRow && current.col == endCol) {
+                java.util.List<int[]> path = reconstructPath(parentRow, parentCol, endRow, endCol);
+
+                System.out.println("Shortest path found (" + (path.size() - 1) + " steps):");
+
+                // 🔥 วาด path ลง map
+                printPathMap(Map, path, startRow, startCol, endRow, endCol);
+
+                return;
+            }
+
+            /*  ไม่เท่
+            if(current.row == endRow && current.col == endCol) {
+                java.util.List<int[]> path = reconstructPath(parentRow, parentCol, endRow, endCol);
+                System.out.println("Shortest path found (" + (path.size() - 1) + " steps):");
+                for(int[] coor : path) {
+                    System.out.println("(" + coor[0] + "," + coor[1] + ")");
+                }
+                return;
+            }
+            */
+
+            closedSet[current.row][current.col] = true;
+
+            for(int[] direction : directions) {
+                int nextRow = current.row + direction[0];
+                int nextCol = current.col + direction[1];
+
+                if(!isInBounds(new int[] {nextRow, nextCol}, rows, cols)) {
+                    continue;
+                }
+
+                if(Map[nextRow][nextCol] == Integer.MAX_VALUE && !(nextRow == endRow && nextCol == endCol)) {
+                    continue;
+                }
+
+                if(closedSet[nextRow][nextCol]) {
+                    continue;
+                }
+
+                int tentativeG = gScore[current.row][current.col] + 1;
+
+                if(tentativeG < gScore[nextRow][nextCol]) {
+                    parentRow[nextRow][nextCol] = current.row;
+                    parentCol[nextRow][nextCol] = current.col;
+                    gScore[nextRow][nextCol] = tentativeG;
+                    int[] nextCoor = {nextRow, nextCol};
+                    fScore[nextRow][nextCol] = tentativeG + heuristic(nextCoor, endCoor);
+                    openSet.add(new Node(nextRow, nextCol, fScore[nextRow][nextCol]));
+                }
+            }
+        }
+
+        System.out.println("No path found from " + start + " to " + end + ".");
+    }
+
+    private static boolean isInBounds(int[] coor, int rows, int cols) {
+        return coor[0] >= 0 && coor[0] < rows && coor[1] >= 0 && coor[1] < cols;
+    }
+
+    private static int heuristic(int[] from, int[] to) {
+        return Math.abs(from[0] - to[0]) + Math.abs(from[1] - to[1]);
+    }
+
+    private static java.util.List<int[]> reconstructPath(int[][] parentRow, int[][] parentCol, int row, int col) {
+        java.util.LinkedList<int[]> path = new java.util.LinkedList<>();
+
+        while(row != -1 && col != -1) {
+            path.addFirst(new int[] {row, col});
+            int prevRow = parentRow[row][col];
+            int prevCol = parentCol[row][col];
+            row = prevRow;
+            col = prevCol;
+        }
+
+        return path;
+    }
+
+    private static class Node implements Comparable<Node> {
+        int row;
+        int col;
+        int f;
+
+        Node(int row, int col, int f) {
+            this.row = row;
+            this.col = col;
+            this.f = f;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return Integer.compare(this.f, other.f);
+        }
+    }
+    
+
+    private static void printPathMap(int[][] Map, java.util.List<int[]> path,int startRow, int startCol,int endRow, int endCol) {
+
+        int rows = Map.length;
+        int cols = Map[0].length;
+
+        char[][] display = new char[rows][cols];
+
+        // default
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                if(Map[i][j] == Integer.MAX_VALUE) display[i][j] = 'X';
+                else display[i][j] = '.';
+            }
+        }
+
+        // ✅ วาด path ก่อน
+        for(int[] p : path) {
+            display[p[0]][p[1]] = '*';
+        }
+
+        // ✅ ใส่ S / E ทีหลัง (จะได้ไม่โดน * ทับ)
+        display[startRow][startCol] = 'S';
+        display[endRow][endCol] = 'E';
+
+        // print
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                System.out.print(display[i][j] + " ");
+            }
+            System.out.println();
+        }
     }
 }

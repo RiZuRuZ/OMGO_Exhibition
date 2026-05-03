@@ -2,6 +2,7 @@ import java.util.Scanner;
 import structures.tree.NameAVL;
 import structures.tree.NameNode;
 import structures.tree.PosAVL;
+import structures.tree.PosNode;
 
 public class ExhibitionSystem {
 
@@ -20,6 +21,7 @@ public class ExhibitionSystem {
             System.out.println("2. Reserve");
             System.out.println("3. Show AVL");
             System.out.println("4. Search by Name");
+            System.out.println("5. Search by Position");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
@@ -46,6 +48,17 @@ public class ExhibitionSystem {
                 if(result == null) System.out.println("Name not found.");
                 else {
                     System.out.println("Positions for " + name + ": " + result.positions);
+                }
+            } else if(choice == 5) {
+                System.out.print("Enter position to search: ");
+                String pos = sc.nextLine();
+
+                PosNode result = posTree.searchByPosition(pos);
+
+                if(result == null) {
+                    System.out.println("Position not found.");
+                } else {
+                    System.out.println("Position " + pos + " reserved by: " + result.name);
                 }
             } else break;
         }

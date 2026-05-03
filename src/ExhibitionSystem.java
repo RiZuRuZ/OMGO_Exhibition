@@ -28,11 +28,12 @@ public class ExhibitionSystem {
 
             int choice = sc.nextInt();
             sc.nextLine(); 
+
             switch(choice) {
-                case 1:
+                case 1: 
                     showMap(Map);
                     break;
-                case 2:
+                case 2: {
                     System.out.print("Enter name: ");
                     String name = sc.nextLine();
 
@@ -40,12 +41,17 @@ public class ExhibitionSystem {
                     String input = sc.nextLine();
                     String[] positions = input.split(" ");
 
+                    for (int i = 0; i < positions.length; i++) {
+                        positions[i] = positions[i].toUpperCase(); // ✅ แปลงเป็นตัวใหญ่ก่อนเช็ค
+                    }
+                    
                     Map = reserve(name, positions, Map);
                     break;
+                }
                 case 3:
                     nameTree.printTree();
                     break;
-                case 4:
+                case 4: {
                     System.out.print("Enter name to search: ");
                     String name = sc.nextLine();
                     NameNode result = nameTree.search(name);
@@ -55,7 +61,8 @@ public class ExhibitionSystem {
                         System.out.println("Positions for " + name + ": " + result.positions);
                     }
                     break;
-                case 5:
+                }
+                case 5: {
                     System.out.print("Enter position to search: ");
                     String pos = sc.nextLine();
 
@@ -67,6 +74,15 @@ public class ExhibitionSystem {
                         System.out.println("Position " + pos + " reserved by: " + result.name);
                     }
                     break;
+                }
+                case 6: {
+                    System.out.print("Enter start position: ");
+                    String start = sc.nextLine();
+                    System.out.print("Enter end position: ");
+                    String end = sc.nextLine();
+                    ShortestPath(Map, start, end);
+                    break;
+                }
                 case 0:
                     System.out.println("Exiting...");
                     sc.close();
@@ -104,6 +120,10 @@ public class ExhibitionSystem {
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
         return Map;
+    }
+
+     private static boolean isValidPosition(String pos) {
+        return pos.matches("^[A-F](1[0-2]|[1-9])$");
     }
 
     public static int[][] createMap() {
@@ -149,10 +169,6 @@ public class ExhibitionSystem {
             }
             System.out.println();
         }
-    }
-
-    private static boolean isValidPosition(String pos) {
-        return pos.matches("^[A-F](1[0-2]|[1-9])$");
     }
 
     public static void ShortestPath(int[][] Map, String start, String end) {

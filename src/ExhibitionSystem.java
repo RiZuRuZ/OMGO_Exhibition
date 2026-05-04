@@ -3,6 +3,7 @@ import structures.tree.NameAVL;
 import structures.tree.NameNode;
 import structures.tree.PosAVL;
 import structures.tree.PosNode;
+import java.util.Random;
 
 public class ExhibitionSystem {
 
@@ -24,6 +25,7 @@ public class ExhibitionSystem {
             System.out.println("4. Search by Name");
             System.out.println("5. Search by Position");
             System.out.println("6. Path Finder");
+            System.out.println("7. Randomize Map");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
@@ -83,6 +85,18 @@ public class ExhibitionSystem {
                     ShortestPath(Map, start, end);
                     break;
                 }
+                case 7: {
+                    System.out.print("Enter min value: ");
+                    int min = sc.nextInt();
+
+                    System.out.print("Enter max value: ");
+                    int max = sc.nextInt();
+
+                    randomizeMap(Map, min, max);
+                    System.out.println("Map randomized!");
+                    break;
+                }
+    
                 case 0:
                     System.out.println("Exiting...");
                     sc.close();
@@ -282,7 +296,7 @@ public class ExhibitionSystem {
                     continue;
                 }
 
-                int tentativeG = gScore[current.row][current.col] + 1;
+                int tentativeG = gScore[current.row][current.col] + Map[nextRow][nextCol];
 
                 if(tentativeG < gScore[nextRow][nextCol]) {
                     parentRow[nextRow][nextCol] = current.row;
@@ -368,6 +382,23 @@ public class ExhibitionSystem {
                 System.out.print(display[i][j] + " ");
             }
             System.out.println();
+        }
+    }
+
+//-------------------Random----------------------
+
+    public static void randomizeMap(int[][] Map, int min, int max) {
+        Random rand = new Random();
+
+        for(int i = 0; i < Map.length; i++) {
+            for(int j = 0; j < Map[0].length; j++) {
+
+                // ❗สุ่มเฉพาะช่องที่ไม่ใช่ INF
+                if(Map[i][j] != Integer.MAX_VALUE) {
+                    Map[i][j] = rand.nextInt(max - min + 1) + min;
+                }
+
+            }
         }
     }
 }

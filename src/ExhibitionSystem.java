@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 import structures.tree.NameAVL;
@@ -27,6 +32,7 @@ public class ExhibitionSystem {
             System.out.println("6. Search by Position");
             System.out.println("7. Path Finder");
             System.out.println("8. Randomize Map");
+            System.out.println("9. Pull Data");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
@@ -104,6 +110,14 @@ public class ExhibitionSystem {
                     System.out.println("Map randomized!");
                     break;
                 }
+                case 9: {
+                    String file = "data.csv";
+
+                    Map = pullFromCSV(file, Map);
+                    System.out.println("Loaded data from CSV!");
+                    break;
+
+                }
     
                 case 0:
                     System.out.println("Exiting...");
@@ -139,6 +153,8 @@ public class ExhibitionSystem {
             posTree.insert(pos, name);
             Map = addPos(Map, pos);
         }
+
+        saveToCSV("data.csv", name, positions);
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
         return Map;
@@ -228,6 +244,57 @@ public class ExhibitionSystem {
             System.out.println();
         }
     }
+
+    public static int[][] pullFromCSV(String filename, int[][] Map) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            boolean firstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                // ข้าม header
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length < 2) {
+                    continue;
+                }
+
+                String name = parts[0].trim();
+                String[] positions = parts[1].trim().split(" ");
+                Map = reserve(name, positions, Map);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+        return Map;
+    }
+
+    public static void saveToCSV(String filename, String name, String[] positions) {
+        
+        try {
+            File file = new File(filename);
+            boolean fileExists = file.exists();
+
+            FileWriter fw = new FileWriter(file, true);
+
+            if (!fileExists) {
+                fw.write("name,positions\n");
+            }
+            // รวม position เป็น string
+            String posStr = String.join(" ", positions);
+
+            fw.write(name + "," + posStr + "\n");
+            fw.close();
+
+        } catch (IOException e) {
+            System.out.println("Error writing file: " + e.getMessage());
+        }
+    }
+
+
     //อื่นๆใส่ก่อนA* นะจ๊ะจะได้ไม่งง
 
 
@@ -239,7 +306,7 @@ public class ExhibitionSystem {
 
 
 
-
+ 
 
 
 

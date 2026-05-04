@@ -1,9 +1,9 @@
+import java.util.Random;
 import java.util.Scanner;
 import structures.tree.NameAVL;
 import structures.tree.NameNode;
 import structures.tree.PosAVL;
 import structures.tree.PosNode;
-import java.util.Random;
 
 public class ExhibitionSystem {
 
@@ -21,11 +21,12 @@ public class ExhibitionSystem {
         while(true) {
             System.out.println("1. Show Map");
             System.out.println("2. Reserve");
-            System.out.println("3. Show AVL");
-            System.out.println("4. Search by Name");
-            System.out.println("5. Search by Position");
-            System.out.println("6. Path Finder");
-            System.out.println("7. Randomize Map");
+            System.out.println("3. Delete Reservation");
+            System.out.println("4. Show AVL");
+            System.out.println("5. Search by Name");
+            System.out.println("6. Search by Position");
+            System.out.println("7. Path Finder");
+            System.out.println("8. Randomize Map");
             System.out.println("0. Exit");
 
             int choice = sc.nextInt();
@@ -50,10 +51,17 @@ public class ExhibitionSystem {
                     Map = reserve(name, positions, Map);
                     break;
                 }
-                case 3:
+                case 3: {
+                    System.out.print("Enter position to cancel (e.g. A1): ");
+                    String pos = sc.nextLine().toUpperCase();
+                    Map = cancelReservation(pos, Map);
+                    break;
+                }
+                case 4: {
                     nameTree.printTree();
                     break;
-                case 4: {
+                }
+                case 5: {
                     System.out.print("Enter name to search: ");
                     String name = sc.nextLine();
                     NameNode result = nameTree.search(name);
@@ -64,7 +72,7 @@ public class ExhibitionSystem {
                     }
                     break;
                 }
-                case 5: {
+                case 6: {
                     System.out.print("Enter position to search: ");
                     String pos = sc.nextLine();
 
@@ -77,7 +85,7 @@ public class ExhibitionSystem {
                     }
                     break;
                 }
-                case 6: {
+                case 7: {
                     System.out.print("Enter start position: ");
                     String start = sc.nextLine();
                     System.out.print("Enter end position: ");
@@ -85,7 +93,7 @@ public class ExhibitionSystem {
                     ShortestPath(Map, start, end);
                     break;
                 }
-                case 7: {
+                case 8: {
                     System.out.print("Enter min value: ");
                     int min = sc.nextInt();
 
@@ -133,6 +141,42 @@ public class ExhibitionSystem {
         }
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
+        return Map;
+    }
+
+    public static int[][] cancelReservation(String pos, int[][] Map) {
+        // 1. เช็คก่อนว่าพิกัดนี้มีคนจองไหม (ดึงข้อมูลจาก PosAVL)
+        PosNode pNode = posTree.searchByPosition(pos);
+        
+        if (pNode == null) {
+            System.out.println("Error: Position " + pos + " is not currently reserved.");
+            return Map;
+        }
+
+        // 2. ถ้าเจอ ให้ดึงชื่อผู้จองออกมา
+        String name = pNode.name;
+        System.out.println("Found reservation by: " + name);
+
+        // 3. ไปลบพิกัดออกจากรายการของ "ชื่อ" นั้นใน NameAVL
+        NameNode nNode = nameTree.search(name);
+        if (nNode != null) {
+            nNode.positions.remove(pos); // ลบพิกัดออกจาก ArrayList
+            
+            // ถ้าคนนี้ไม่เหลือพิกัดที่จองแล้ว ให้ลบ Node ชื่อนี้ออกจาก NameTree ไปเลย
+            if (nNode.positions.isEmpty()) {
+                nameTree.delete(name);
+                System.out.println("User " + name + " has no more reservations. Removing user from system.");
+            }
+        }
+
+        // 4. ลบพิกัดออกจาก PosAVL
+        posTree.delete(pos);
+
+        // 5. คืนค่าพิกัดใน Map (เปลี่ยนจาก INF กลับเป็น 1 เพื่อให้เดินผ่านได้)
+        int[] coor = parseCoor(pos);
+        Map[coor[0]][coor[1]] = 1;
+
+        System.out.println("✅ Successfully cancelled position " + pos + " for " + name);
         return Map;
     }
 

@@ -94,4 +94,51 @@ public class PosAVL {
     public PosNode searchByPosition(String pos) {
         return search(root, pos);
     }
+
+    public void delete(String pos) {
+        root = deleteRec(root, pos);
+    }
+
+    private PosNode deleteRec(PosNode node, String pos) {
+        if (node == null) return null;
+
+        int cmp = pos.compareTo(node.pos);
+        if (cmp < 0)
+            node.left = deleteRec(node.left, pos);
+        else if (cmp > 0)
+            node.right = deleteRec(node.right, pos);
+        else {
+            if ((node.left == null) || (node.right == null)) {
+                node = (node.left != null) ? node.left : node.right;
+            } else {
+                PosNode temp = minValueNode(node.right);
+                node.pos = temp.pos;
+                node.name = temp.name;
+                node.right = deleteRec(node.right, temp.pos);
+            }
+        }
+
+        if (node == null) return null;
+
+        node.height = 1 + Math.max(height(node.left), height(node.right));
+        int balance = getBalance(node);
+
+        if (balance > 1 && getBalance(node.left) >= 0) return rotateRight(node);
+        if (balance > 1 && getBalance(node.left) < 0) {
+            node.left = rotateLeft(node.left);
+            return rotateRight(node);
+        }
+        if (balance < -1 && getBalance(node.right) <= 0) return rotateLeft(node);
+        if (balance < -1 && getBalance(node.right) > 0) {
+            node.right = rotateRight(node.right);
+            return rotateLeft(node);
+        }
+        return node;
+    }
+
+    private PosNode minValueNode(PosNode node) {
+        PosNode current = node;
+        while (current.left != null) current = current.left;
+        return current;
+    }
 }

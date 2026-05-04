@@ -5,6 +5,21 @@ import structures.tree.PosAVL;
 import structures.tree.PosNode;
 
 public class ExhibitionSystem {
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String PURPLE = "\u001B[35m";
+    public static final String CYAN = "\u001B[36m";
+    public static final String WHITE = "\u001B[37m";
+    public static final String REDBG = "\u001B[41m";
+    public static final String GREENBG = "\u001B[42m";
+    public static final String YELLOWBG = "\u001B[43m";
+    public static final String BLUEBG = "\u001B[44m";
+    public static final String PURPLEBG = "\u001B[45m";
+    public static final String CYANBG = "\u001B[46m";
+    public static final String WHITEBG = "\u001B[47m";
 
     static String[][] map = new String[6][12];
 
@@ -162,13 +177,27 @@ public class ExhibitionSystem {
     }
 
     public static void showMap(int[][] Map) {
+        System.out.println("\n   |     " + CYAN + "  A    B  " + RESET + "     " + CYAN + "  C    D  " + RESET + "     " + CYAN + "  E    F  " + RESET);
+        System.out.println("---+-------------------------------------------------");
+
+        byte r = 1;
         for(int i = 0 ; i < Map.length; i++) {
+            if(i%5!=0){
+                if(r < 10){System.out.print(" " + CYAN + r + RESET + " ");}
+                else {System.out.print(CYAN + r + RESET + " ");}
+
+                r++;
+            }
+            else {System.out.print("   ");}
+            System.out.print("|");
+
             for(int j = 0; j < Map[0].length; j++) {
-                if(Map[i][j] == Integer.MAX_VALUE) System.out.print("INF ");
-                else System.out.print(Map[i][j] + " ");
+                if(Map[i][j] == Integer.MAX_VALUE) System.out.print(YELLOWBG + " RES " + RESET);
+                else System.out.print("  " + Map[i][j] + "  ");
             }
             System.out.println();
         }
+        System.out.println();
     }
     //อื่นๆใส่ก่อนA* นะจ๊ะจะได้ไม่งง
 
@@ -363,11 +392,29 @@ public class ExhibitionSystem {
         display[endRow][endCol] = 'E';
 
         // print
+        System.out.println("\n   |     " + CYAN + "  A    B  " + RESET + "     " + CYAN + "  C    D  " + RESET + "     " + CYAN + "  E    F  " + RESET);
+        System.out.println("---+-------------------------------------------------");
+
+        byte r = 1;
         for(int i = 0; i < rows; i++) {
+            if(i%5!=0){
+                if(r < 10){System.out.print(" " + CYAN + r + RESET + " ");}
+                else {System.out.print(CYAN + r + RESET + " ");}
+
+                r++;
+            }
+            else {System.out.print("   ");}
+            System.out.print("|");
+
             for(int j = 0; j < cols; j++) {
-                System.out.print(display[i][j] + " ");
+                if(display[i][j]=='.'){System.out.print("  " + display[i][j] + "  ");}
+                else if(display[i][j]=='*'){System.out.print(GREEN + "  " + display[i][j] + "  " + RESET);}
+                else if(display[i][j]=='X'){System.out.print(YELLOWBG + "  " + display[i][j] + "  " + RESET);}
+                else if(display[i][j]=='S'){System.out.print(GREENBG + "  " + display[i][j] + "  " + RESET);}
+                else if(display[i][j]=='E'){System.out.print(REDBG + "  " + display[i][j] + "  " + RESET);}
             }
             System.out.println();
         }
+        System.out.println();
     }
 }

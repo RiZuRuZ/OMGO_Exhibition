@@ -149,7 +149,7 @@ public class ExhibitionSystem {
         }
 
         saveToCSV("data.csv", name, positions);
-        
+
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
         return Map;
     }

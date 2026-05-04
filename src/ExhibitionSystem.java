@@ -391,7 +391,7 @@ public class ExhibitionSystem {
         display[startRow][startCol] = 'S';
         display[endRow][endCol] = 'E';
 
-        // print
+        //print
         System.out.println("\n   |     " + CYAN + "  A    B  " + RESET + "     " + CYAN + "  C    D  " + RESET + "     " + CYAN + "  E    F  " + RESET);
         System.out.println("---+-------------------------------------------------");
 

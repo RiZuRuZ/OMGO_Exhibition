@@ -333,7 +333,8 @@ public class ExhibitionSystem {
             for(int j = 0; j < Map[0].length; j++) {
 
                 if(Map[i][j] == Integer.MAX_VALUE) {
-                    System.out.print(YELLOWBG + " RES " + RESET);
+                    String pos = matrixToPosition(i, j);
+                    System.out.print(YELLOWBG + " " + pos + " " + RESET);
                 }
                 else {
                     System.out.print("  " + Map[i][j] + "  ");
@@ -427,6 +428,16 @@ public class ExhibitionSystem {
 
 
 
+    public static String matrixToPosition(int row, int col) {
+
+        int seatRow = row - 1 - ((row - 1) / 5) + 1;
+
+        int seatCol = col - 1 - (col / 3);
+
+        char letter = (char)('A' + seatCol);
+
+        return String.format("%c%02d", letter, seatRow);
+    }
 
     // A* Algorithm
     public static void ShortestPath(int[][] Map, String start, String end) {
@@ -604,8 +615,36 @@ public class ExhibitionSystem {
         display[endRow][endCol] = 'E';
 
         //print
-        System.out.println("\n   |     " + CYAN + "  A    B  " + RESET + "     " + CYAN + "  C    D  " + RESET + "     " + CYAN + "  E    F  " + RESET);
-        System.out.println("---+-------------------------------------------------");
+        // HEADER
+        System.out.print("\n   |");
+
+        int seatIndex = 0;
+
+        for(int j = 0; j < cols; j++) {
+
+            if(j % 3 == 0) {
+                System.out.print("     ");
+            }
+            else {
+
+                char letter = (char)('A' + seatIndex);
+
+                System.out.print("  " + CYAN + letter + RESET + "  ");
+
+                seatIndex++;
+            }
+        }
+
+        System.out.println();
+
+        // LINE
+        System.out.print("---+");
+
+        for(int j = 0; j < cols; j++) {
+            System.out.print("-----");
+        }
+
+        System.out.println();
 
         byte r = 1;
         for(int i = 0; i < rows; i++) {

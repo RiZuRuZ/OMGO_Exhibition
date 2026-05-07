@@ -332,7 +332,7 @@ public class ExhibitionSystem {
 
             FileWriter fw = new FileWriter(filename, false);
 
-            fw.write("name,position\n");
+            fw.write("name,positions\n");
 
             nameTree.exportToCSV(fw);
             fw.close();

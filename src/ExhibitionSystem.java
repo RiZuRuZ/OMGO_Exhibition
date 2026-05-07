@@ -99,7 +99,7 @@ public class ExhibitionSystem {
                 }
                 case 6: {
                     System.out.print("Enter position to search: ");
-                    String pos = sc.nextLine();
+                    String pos = sc.nextLine().toUpperCase();
 
                     PosNode result = posTree.searchByPosition(pos);
 

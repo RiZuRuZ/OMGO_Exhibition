@@ -1,5 +1,8 @@
 package structures.tree;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class NameAVL {
     private NameNode root;
 
@@ -156,5 +159,22 @@ public class NameAVL {
         NameNode current = node;
         while (current.left != null) current = current.left;
         return current;
+    }
+
+    public void exportToCSV(FileWriter fw) throws IOException {
+        exportRec(root, fw);
+    }
+
+    private void exportRec(NameNode node, FileWriter fw) throws IOException {
+        if (node != null) {
+
+            exportRec(node.left, fw);
+
+            String positions = String.join(" ", node.positions);
+
+            fw.write(node.name + "," + positions + "\n");
+
+            exportRec(node.right, fw);
+        }
     }
 }

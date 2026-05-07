@@ -207,6 +207,9 @@ public class ExhibitionSystem {
         int[] coor = parseCoor(pos);
         Map[coor[0]][coor[1]] = 1;
 
+         // sync file
+        rewriteCSV("data.csv");
+
         System.out.println("✅ Successfully cancelled position " + pos + " for " + name);
         return Map;
     }
@@ -323,7 +326,22 @@ public class ExhibitionSystem {
         }
     }
 
+    public static void rewriteCSV(String filename) {
 
+        try {
+
+            FileWriter fw = new FileWriter(filename, false);
+
+            fw.write("name,position\n");
+
+            nameTree.exportToCSV(fw);
+            fw.close();
+
+        } catch (IOException e) {
+            System.out.println("Error rewriting CSV: " + e.getMessage());
+        }
+
+    }
     //อื่นๆใส่ก่อนA* นะจ๊ะจะได้ไม่งง
 
 

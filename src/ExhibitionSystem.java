@@ -73,7 +73,7 @@ public class ExhibitionSystem {
                         positions[i] = positions[i].toUpperCase(); // ✅ แปลงเป็นตัวใหญ่ก่อนเช็ค
                     }
                     
-                    Map = reserve(name, positions, Map);
+                    Map = reserve(name, positions, Map, true);
                     break;
                 }
                 case 3: {
@@ -99,7 +99,7 @@ public class ExhibitionSystem {
                 }
                 case 6: {
                     System.out.print("Enter position to search: ");
-                    String pos = sc.nextLine();
+                    String pos = sc.nextLine().toUpperCase();
 
                     PosNode result = posTree.searchByPosition(pos);
 
@@ -148,8 +148,7 @@ public class ExhibitionSystem {
         }
     }
 
-    public static int[][] reserve(String name, String[] positions, int[][] Map) {
-
+    public static int[][] reserve(String name, String[] positions, int[][] Map, boolean saveFile) {
         // ✅ เช็ค format ก่อน
         for(String pos : positions) {
             if(!isValidPosition(pos)) {
@@ -173,7 +172,9 @@ public class ExhibitionSystem {
             Map = addPos(Map, pos);
         }
 
-        saveToCSV("data.csv", name, positions);
+        if(saveFile) {
+            saveToCSV("data.csv", name, positions);
+        }
 
         System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
         return Map;
@@ -366,7 +367,7 @@ public class ExhibitionSystem {
 
                 String name = parts[0].trim();
                 String[] positions = parts[1].trim().split(" ");
-                Map = reserve(name, positions, Map);
+                Map = reserve(name, positions, Map, false);
             }
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
@@ -402,7 +403,7 @@ public class ExhibitionSystem {
 
             FileWriter fw = new FileWriter(filename, false);
 
-            fw.write("name,position\n");
+            fw.write("name,positions\n");
 
             nameTree.exportToCSV(fw);
             fw.close();

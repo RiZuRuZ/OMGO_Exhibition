@@ -27,7 +27,11 @@ public class ExhibitionSystem {
     public static final String CYANBG = "\u001B[46m";
     public static final String WHITEBG = "\u001B[47m";
 
-    static String[][] map = new String[6][12];
+
+    static final int SEAT_COLS = 10; 
+    static final int SEAT_ROWS = 12;
+
+    static String[][] map = new String[SEAT_ROWS][SEAT_COLS];
 
     static NameAVL nameTree = new NameAVL();
     static PosAVL posTree = new PosAVL();
@@ -214,13 +218,30 @@ public class ExhibitionSystem {
         return Map;
     }
 
-     private static boolean isValidPosition(String pos) {
-        return pos.matches("^[A-F](1[0-2]|[1-9])$");
+    private static boolean isValidPosition(String pos) {
+
+        if(pos.length() < 2) return false;
+
+        char col = Character.toUpperCase(pos.charAt(0));
+
+        if(col < 'A' || col >= 'A' + SEAT_COLS) {
+            return false;
+        }
+
+        int row;
+
+        try {
+            row = Integer.parseInt(pos.substring(1));
+        } catch(Exception e) {
+            return false;
+        }
+
+        return row >= 1 && row <= SEAT_ROWS;
     }
 
     public static int[][] createMap() {
-        int rows = 16;
-        int cols = 10;
+        int rows = SEAT_ROWS + (SEAT_ROWS / 4) + 1;
+        int cols = SEAT_COLS + (SEAT_COLS / 2) + 1;
 
         int Map[][] = new int[rows][cols];
         for(int i = 0; i < rows; i++) {
@@ -254,26 +275,74 @@ public class ExhibitionSystem {
     }
 
     public static void showMap(int[][] Map) {
-        System.out.println("\n   |     " + CYAN + "  A    B  " + RESET + "     " + CYAN + "  C    D  " + RESET + "     " + CYAN + "  E    F  " + RESET);
-        System.out.println("---+-------------------------------------------------");
+
+        // HEADER
+        System.out.print("\n   |");
+
+        int seatIndex = 0;
+
+        for(int j = 0; j < Map[0].length; j++) {
+
+            // ตำแหน่ง aisle
+            if(j % 3 == 0) {
+                System.out.print("     ");
+            }
+            else {
+
+                char letter = (char)('A' + seatIndex);
+
+                System.out.print("  " + CYAN + letter + RESET + "  ");
+
+                seatIndex++;
+            }
+        }
+
+        System.out.println();
+
+        // LINE
+        System.out.print("---+");
+
+        for(int j = 0; j < Map[0].length; j++) {
+            System.out.print("-----");
+        }
+
+        System.out.println();
 
         byte r = 1;
+
         for(int i = 0 ; i < Map.length; i++) {
-            if(i%5!=0){
-                if(r < 10){System.out.print(" " + CYAN + r + RESET + " ");}
-                else {System.out.print(CYAN + r + RESET + " ");}
+
+            // aisle row
+            if(i % 5 != 0) {
+
+                if(r < 10) {
+                    System.out.print(" " + CYAN + r + RESET + " ");
+                }
+                else {
+                    System.out.print(CYAN + r + RESET + " ");
+                }
 
                 r++;
             }
-            else {System.out.print("   ");}
+            else {
+                System.out.print("   ");
+            }
+
             System.out.print("|");
 
             for(int j = 0; j < Map[0].length; j++) {
-                if(Map[i][j] == Integer.MAX_VALUE) System.out.print(YELLOWBG + " RES " + RESET);
-                else System.out.print("  " + Map[i][j] + "  ");
+
+                if(Map[i][j] == Integer.MAX_VALUE) {
+                    System.out.print(YELLOWBG + " RES " + RESET);
+                }
+                else {
+                    System.out.print("  " + Map[i][j] + "  ");
+                }
             }
+
             System.out.println();
         }
+
         System.out.println();
     }
 

@@ -46,7 +46,7 @@ public class ExhibitionSystem {
             System.out.println("1. Show Map");
             System.out.println("2. Reserve");
             System.out.println("3. Delete Reservation");
-            System.out.println("4. Show AVL");
+            System.out.println("4. Show Name and Position"); //show avl tree
             System.out.println("5. Search by Name");
             System.out.println("6. Search by Position");
             System.out.println("7. Path Finder");
@@ -149,34 +149,46 @@ public class ExhibitionSystem {
     }
 
     public static int[][] reserve(String name, String[] positions, int[][] Map, boolean saveFile) {
-        // ✅ เช็ค format ก่อน
+        // 1. เช็ค format และความถูกต้องเบื้องต้น
         for(String pos : positions) {
             if(!isValidPosition(pos)) {
                 System.out.println("Invalid position: " + pos);
-                return Map; //หยุดทันที
-            }
-        }
-
-        // ✅ เช็คว่าซ้ำไหม
-        for(String pos : positions) {
-            if(posTree.exists(pos)) {
-                System.out.println("Position " + pos + " is already reserved.");
                 return Map;
             }
         }
 
-        // ✅ insert จริง
+        // 2. ตรวจสอบว่าตำแหน่งเหล่านี้ถูกจองไปหรือยัง (เช็กใน Memory/AVL Tree)
+        // หากเป็นการ Pull จาก CSV ข้อมูลจะยังไม่เข้า Tree จึงผ่านขั้นตอนนี้ได้
+        boolean isAlreadyInTree = true;
         for(String pos : positions) {
-            nameTree.insert(name, pos);
-            posTree.insert(pos, name);
-            Map = addPos(Map, pos);
+            if(!posTree.exists(pos)) {
+                isAlreadyInTree = false; // ถ้ามีแม้แต่ที่เดียวที่ยังไม่จอง ให้ถือว่าต้องประมวลผล
+                break;
+            }
         }
 
+        // ถ้าทุกตำแหน่งมีใน Tree อยู่แล้ว และไม่ใช่การโหลดไฟล์ ให้หยุดทำงานเพื่อป้องกัน Data ซ้ำ
+        if(isAlreadyInTree && saveFile) {
+            System.out.println("Positions already reserved in system.");
+            return Map;
+        }
+
+        // 3. ทำการ Insert ลง AVL Tree และ Update Map
+        for(String pos : positions) {
+            // เช็กซ้ำอีกทีกันเหนื่อย เผื่อบางที่ว่างบางที่ไม่ว่าง
+            if(!posTree.exists(pos)) {
+                nameTree.insert(name, pos);
+                posTree.insert(pos, name);
+                Map = addPos(Map, pos);
+            }
+        }
+
+        // 4. บันทึกข้อมูลงไฟล์ CSV เฉพาะเมื่อมีการจองใหม่ (saveFile = true) 
+        // และต้องมั่นใจว่าไม่ใช่ข้อมูลเดิมที่โหลดมาจาก pullFromCSV
         if(saveFile) {
             saveToCSV("data.csv", name, positions);
         }
 
-        System.out.println("Reservation successful for " + name + " at positions: " + String.join(", ", positions));
         return Map;
     }
 
@@ -349,24 +361,27 @@ public class ExhibitionSystem {
     }
 
     public static int[][] pullFromCSV(String filename, int[][] Map) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        File file = new File(filename);
+        if (!file.exists()) return Map; // ถ้าไม่มีไฟล์ก็ไม่ต้องทำอะไร
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             boolean firstLine = true;
 
             while ((line = br.readLine()) != null) {
-                // ข้าม header
                 if (firstLine) {
                     firstLine = false;
                     continue;
                 }
 
                 String[] parts = line.split(",");
-                if (parts.length < 2) {
-                    continue;
-                }
+                if (parts.length < 2) continue;
 
                 String name = parts[0].trim();
                 String[] positions = parts[1].trim().split(" ");
+
+                // ส่ง saveFile เป็น false เพื่อให้โหลดเข้า AVL/Map อย่างเดียว 
+                // ไม่ต้องเขียนกลับลงไฟล์ CSV ซ้ำอีก
                 Map = reserve(name, positions, Map, false);
             }
         } catch (IOException e) {
